@@ -27,7 +27,7 @@ public class JuegosServiceTest {
     void setUp() {
         juego = new Juegos();
         juego.setId(5L);
-        juego.setNombre("Minecraft");
+        juego.setNombre("God of War");
     }
 
     @Test
