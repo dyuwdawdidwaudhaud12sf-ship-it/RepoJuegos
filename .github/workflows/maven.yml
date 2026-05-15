@@ -6,12 +6,23 @@ on:
   pull_request:
     branches: [ "main" ]
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testdb
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
       - name: 1. Descargar el código del repositorio
@@ -23,5 +34,9 @@ jobs:
           java-version: '25'
           distribution: 'temurin'
 
-      - name: 3. Ejecutar las pruebas unitarias con Maven
+      - name: 3. Ejecutar tests con Maven
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/testdb?serverTimezone=UTC
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: root
         run: mvn test
